@@ -34,6 +34,8 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors());
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 app.use(express.static(path.join(__dirname, './build')));
 
 app.get("*", (req, res) => {
