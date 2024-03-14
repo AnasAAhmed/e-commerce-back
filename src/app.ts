@@ -13,6 +13,7 @@ import productRoute from "./routes/products.js";
 import orderRoute from "./routes/order.js";
 import paymentRoute from "./routes/payment.js";
 import dashboardRoute from "./routes/stats.js";
+import path from "path";
 
 config({
   path: "./.env",
@@ -33,8 +34,10 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("API Working with /api/v1");
+app.use(express.static(path.join(__dirname, './build')));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "./build/index.html"));
 });
 
 // Using Routes
