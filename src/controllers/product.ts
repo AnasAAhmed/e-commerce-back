@@ -33,7 +33,7 @@ export const getlatestProducts = TryCatch(async (req, res, next) => {
 export const getLatestCategoryProducts = TryCatch(async (req, res, next) => {
   const category = req.params.category;
 
-  const products = await Product.find({ category: category }).limit(4);
+  const products = await Product.find({ category: category }).sort({ createdAt: -1 }).limit(4);
 
   return res.status(200).json({
     success: true,
@@ -64,7 +64,7 @@ export const getAdminProducts = TryCatch(async (req, res, next) => {
   if (myCache.has("all-products"))
     products = JSON.parse(myCache.get("all-products") as string);
   else {
-    products = await Product.find({});
+    products = await Product.find({}).sort({ createdAt: -1 });
     myCache.set("all-products", JSON.stringify(products));
   }
 
@@ -95,7 +95,7 @@ export const getSingleProduct = TryCatch(async (req, res, next) => {
 
 export const newProduct = TryCatch(
   async (req: Request<{}, {}, NewProductRequestBody>, res, next) => {
-    const { name, price, description, stock, category } = req.body;
+    const { name, price,cutPrice, description, stock, category } = req.body;
     const photo = req.file;
 
     if (!photo) return next(new ErrorHandler("Please add Photo", 400));
@@ -111,6 +111,7 @@ export const newProduct = TryCatch(
     await Product.create({
       name,
       price,
+      cutPrice,
       description,
       stock,
       category: category.toLowerCase(),
@@ -128,7 +129,7 @@ export const newProduct = TryCatch(
 
 export const updateProduct = TryCatch(async (req, res, next) => {
   const { id } = req.params;
-  const { name, price, description, stock, category } = req.body;
+  const { name, price,cutPrice, description, stock, category } = req.body;
   const photo = req.file;
   const product = await Product.findById(id);
 
@@ -144,6 +145,7 @@ export const updateProduct = TryCatch(async (req, res, next) => {
   if (name) product.name = name;
   if (price) product.price = price;
   if (description) product.description = description;
+  if (cutPrice) product.cutPrice = cutPrice;
   if (stock) product.stock = stock;
   if (category) product.category = category;
 
@@ -188,9 +190,6 @@ export const getAllProducts = TryCatch(
     const { search, sort, category, price } = req.query;
 
     const page = Number(req.query.page) || 1;
-    // 1,2,3,4,5,6,7,8
-    // 9,10,11,12,13,14,15,16
-    // 17,18,19,20,21,22,23,24
     const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
     const skip = (page - 1) * limit;
 

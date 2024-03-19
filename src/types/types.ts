@@ -14,6 +14,7 @@ export interface NewProductRequestBody {
   category: string;
   description: string;
   price: number;
+  cutPrice: number;
   stock: number;
 }
 
